@@ -72,12 +72,9 @@ def main():
     torch.manual_seed(hps.train.seed)
     
     train_list = os.path.join(filelist_dir, hps.data.training_files)
-    if hps.data.spec_scale == 'linear':
-        train_dataset = SpecLoader(train_list, hps.data)
-        collate_fn = SpecCollate(1)
-    else:
-        train_dataset = MelLoader(train_list, hps.data)
-        collate_fn = MelCollate(1)
+    train_dataset = SpecLoader(train_list, hps.data)
+    collate_fn = SpecCollate(1)
+
     train_loader = DataLoader(train_dataset, num_workers=1, shuffle=True,
                               batch_size=hps.train.batch_size, pin_memory=True,
                               drop_last=True, collate_fn=collate_fn)

@@ -1,11 +1,11 @@
 
 # Generative Source Separation using Glow
-source separation as an inverse problem This model is trained using spectrogram features. 
+Source separation as an inverse problem.  
 
 ## Introduction
-Music source separation with both paired mixed signals and source signals has obtained substantial progress over the years. However, this setting highly relies on large amounts of paired data. Source-only supervision decouples the process of learning a mapping from a mixture to particular sources into a two stage paradigm: source modeling and separation. Recent systems under source-only supervision either achieve good performance in synthetic toy experiments or limited performance in music separation task. In this paper, we leverage flow-based implicit generators to train music source priors and likelihood based objective to separate music mixtures. Experiments show that in both singing voice and music separation tasks, our proposed systems achieve competitive results to one of the full supervision systems. We also demonstrate one variant of our proposed systems is capable of separating new source tracks effortlessly. 
+Music source separation with both paired mixed signals and source signals has obtained substantial progress over the years. However, this setting highly relies on large amounts of paired data. Source-only supervision decouples the process of learning a mapping from a mixture to particular sources into a two stage paradigm: source modeling and separation. In this project, we leverage flow-based implicit generators to train music source priors and likelihood based objective to separate music mixtures.
 
-<p align="center"><img align="center" src="./diagram.png", width=450></p>
+<p align="center"><img align="center" src="./diagram.png", width=900></p>
 
 ## requirements
 pytorch>=1.5.0\
@@ -20,33 +20,6 @@ pandas
     
 ### Inference
 Run `inference_demo.py` for further details.
-
-### Model training
-
-We provide uncontional generator training, conditional version is easy to implement based on unconditional version.
-
-#### unconditional glow model
-Go to corresponding generator folder, create json file similar to given template file in ./configs folder first</br>
-Run init first to create list for training and test, then run: </br>
-```
-python init_musdb.py -m musdb -c ./configs/musdb.json
-```
-Then run train:</br>
-```
-python train_musdb.py -m musdb -c ./configs/musdb.json
-```
-
-
-## Pretrained models:
-### dataset:
-
-#### Music
-MUSDB: https://sigsep.github.io/datasets/musdb.html 
-
-### model
-
-
-([Pretrained model folder](https://drive.google.com))
 
 ## Experimental Results on MusDB
 | Method     |Backbone   |  Vocals  | Bass     |Drums     | Other    |
