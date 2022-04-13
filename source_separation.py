@@ -1,0 +1,96 @@
+import torch
+from torch import optim
+from tqdm import tqdm
+import os, glob
+from scipy.io.wavfile import read
+import torch.nn.functional as F
+import random
+import numpy as np
+import inverse_utils
+import generator.glow.commons as commons
+EPSILON = torch.finfo(torch.float32).eps
+
+def music_sep_batch(mixtures, genList, stft,
+                    optSpace, lr, sigma, 
+                    alpha1, alpha2, 
+                    iteration, condition=False, 
+                    scheduler_step_size=800, 
+                    scheduler_gamma=0.2):
+
+    # freeze generators weights
+    if condition:
+        gen, labels, labels2ids = genList
+        numGen = len(labels)
+        for param in gen.parameters():
+            param.requires_grad = False
+    else:
+        numGen = len(genList)
+        for genUnc in genList:
+            for param in genUnc.parameters():
+                param.requires_grad = False
+    
+    # compute spectrogram from mixture and cancel the log
+    mixSpecs, mixPhases = inverse_utils.get_spec(mixtures, stft) # 513 * T
+    mixSpecs = F.pad(mixSpecs.unsqueeze(0), (0, 0, 0, 1), "constant", 0) # 514 * T
+    batch_size = mixSpecs.shape[0]
+    segLen = int(mixSpecs.shape[-1] / 2) * 2 # glow model requires even dimension
+    segLenTensor = torch.LongTensor([segLen]*batch_size).cuda() 
+    mixSpecs = mixSpecs[:, :, :segLen].cuda().requires_grad_(False)
+    mixPhases = mixPhases[:, :, :segLen].requires_grad_(False)
+    
+    # zCol of shape (batch_size, num_sources, *spec_shape...)
+    zCol = torch.randn((batch_size, numGen, mixSpecs.shape[-2], segLen), 
+                       dtype=torch.float, device='cuda')
+    zCol = (sigma * zCol).requires_grad_(True)
+    
+    optimizer = optim.Adam([zCol], lr=lr)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma)
+
+    # define loss and initialize data variables
+    for i in tqdm(range(iteration)):
+        xCol = []
+        mixSynSpecs = 0
+        logdets = []
+        z_masks = []
+        for j in range(numGen):
+
+            if condition:
+                label = labels[j]
+                tar_id = labels2ids[label]
+                tar_sid = torch.IntTensor([tar_id]).cuda().long()
+            else:
+                tar_sid = None
+                gen = genList[j]
+
+            xTemp, logdet, z_mask = gen(zCol[:, j, :, :], segLenTensor, 
+                                        g=tar_sid, gen=True) # full batch for each source
+            
+            logdets.append(-logdet) # logdet in reverse gives log|dx/dz|, we want log|dz/dx|
+            mixSynSpecs += xTemp
+            xCol.append(xTemp)
+            z_masks.append(z_mask)
+
+        mixSpecs = torch.abs(mixSpecs)  + 1e-8
+        mixSynSpecs = torch.abs(mixSynSpecs)  + 1e-8
+        
+        loss_rec = (mixSpecs * torch.log(mixSpecs/mixSynSpecs + 1e-8) - mixSpecs + mixSynSpecs).mean()
+
+        # regularization
+        loss_r = 0.0
+        for j in range(numGen):
+            if optSpace == 'z':
+                lss = 0.5 * torch.sum(zCol[:, j, :, :] ** 2) # neg normal likelihood w/o the constant term
+                l_mle = lss / torch.sum(torch.ones_like(zCol[:, j, :, :]) * z_masks[j]) # averaging across batch, channel and time axes
+            elif optSpace == 'x':
+                l_mle = commons.mle_loss(zCol[:, j, :, :], logdets[j], z_masks[j]) # logdets and z_masks are first indexed by source_num
+            loss_gs = [l_mle]
+            loss_r += sum(loss_gs)
+            
+        loss = alpha1 * loss_rec + alpha2 * loss_r #+ 0.1 * loss_coh
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        scheduler.step()
+    
+    return torch.stack(xCol), mixPhases
