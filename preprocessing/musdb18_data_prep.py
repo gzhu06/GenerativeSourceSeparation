@@ -190,8 +190,6 @@ def main():
                 os.makedirs(pieceFolder, exist_ok=True)
                 for inst in instsOfInterest:
                     split_files(trimFolder, pieceFolder, inst)
-                    
-                  
 
 if __name__ == "__main__":
     main()

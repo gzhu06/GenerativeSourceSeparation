@@ -3,14 +3,16 @@
 Unconditional audio generator Glow 
 
 ## Introduction
-We provide uncontional generator training for modeling source priors, conditional version is easy to implement based on unconditional version. In Glow generator training, we use apex from NVIDIA.
+We provide uncontional generator training using MUSDB18 for modeling source priors, conditional version is easy to implement based on unconditional version. In Glow generator training, we use apex from NVIDIA.
 
 ## Usage
 
 ### Model training
 
-Go to corresponding generator folder, create json file similar to given template file in ./configs folder first</br>
-Run init first to create list for training and test, then run: </br>
+In data preparation, we use `musdb18_data_prep.py` to resample, trim and split the original MUSDB18 audio files. 
+
+Before training, create json file similar to given template file in ./configs folder first</br>
+Run `init_musdb.py` first to create list for training and test, then run: </br>
 ```
 python init_musdb.py -m musdb -c ./configs/musdb.json
 ```

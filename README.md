@@ -15,12 +15,12 @@ jupyter\
 museval\
 tqdm\
 pandas\
-(apex)[https://github.com/NVIDIA/apex]
+[apex](https://github.com/NVIDIA/apex)
 
 ## Usage
     
 ### Inference
-Run `inference_demo.py` for further details.
+There's two examples in `inference_demo.py`. You can also try your own music mixture wav files. In our framework, it's able to process relatively long audio segments (even over 1 minute).
 
 ## Experimental Results on MusDB
 | Method     |Backbone   |  Vocals  | Bass     |Drums     | Other    |

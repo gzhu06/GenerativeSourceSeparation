@@ -64,7 +64,7 @@ def main():
     
     filelist_dir = os.path.join('./filelists/', hps.model_dir.split('/')[-1])
     if len(glob(filelist_dir + '/*.txt')) == 0:
-        tarInst = params.log_dir.split('/')[-1]
+        tarInst = hps.model_dir.split('/')[-1]
         filelist_gen(hps, tarInst)
     logger = utils.get_logger(hps.model_dir)
     logger.info(hps)
