@@ -1,18 +1,9 @@
 
-# UnGlow
-Unconditional audio generator UnGlow 
+# Glow
+Unconditional audio generator Glow 
 
 ## Introduction
-We provide uncontional generator training for modeling source priors, conditional version is easy to implement based on unconditional version.
-
-## requirements
-pytorch>=1.5.0\
-tqdm\
-librosa\
-jupyter\
-museval\
-tqdm\
-pandas
+We provide uncontional generator training for modeling source priors, conditional version is easy to implement based on unconditional version. In Glow generator training, we use apex from NVIDIA.
 
 ## Usage
 
@@ -36,8 +27,7 @@ python train_musdb.py -m musdb -c ./configs/musdb.json
 MUSDB: https://sigsep.github.io/datasets/musdb.html 
 
 ### model
-
-
+Pretrained models and configurations will be released soon.
 ([Pretrained model folder](https://drive.google.com))
 
 
