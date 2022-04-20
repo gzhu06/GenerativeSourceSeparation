@@ -6,6 +6,8 @@ Unconditional audio generator Glow
 We provide uncontional generator training using MUSDB18 for modeling source priors, conditional version is easy to implement based on unconditional version. In Glow generator training, we use apex from NVIDIA.
 
 ## Usage
+### Dataset:
+MUSDB: https://sigsep.github.io/datasets/musdb.html 
 
 ### Model training
 
@@ -25,14 +27,10 @@ Replace {musdb} with one of instruments previously defined in `musdb18_data_prep
 
 
 ## Pretrained models:
-### dataset:
-
-#### Music
-MUSDB: https://sigsep.github.io/datasets/musdb.html 
 
 ### model
-Pretrained models and configurations will be released soon.
-([Pretrained model folder](https://drive.google.com))
+Download this file, unzip and move every folder to `./logs`
+([Pretrained model folder](https://drive.google.com/file/d/16_L8-f1mYZ7oHnoxDpVTjAEpDHeBEb2y/view?usp=sharing))
 
 
 ## References
