@@ -9,17 +9,19 @@ We provide uncontional generator training using MUSDB18 for modeling source prio
 
 ### Model training
 
-In data preparation, we use `musdb18_data_prep.py` to resample, trim and split the original MUSDB18 audio files. 
+In data preparation, we use `musdb18_data_prep.py` to define instruments to train prior on and for train/test split. Also prepare audio data segments with resampling, trimming and splitting the original MUSDB18 audio files.
 
 Before training, create json file similar to given template file in ./configs folder first</br>
 Run `init_musdb.py` first to create list for training and test, then run: </br>
 ```
-python init_musdb.py -m musdb -c ./configs/musdb.json
+python init_musdb.py -m {musdb} -c ./configs/{musdb}.json
 ```
 Then run train:</br>
 ```
-python train_musdb.py -m musdb -c ./configs/musdb.json
+python train_musdb.py -m {musdb} -c ./configs/{musdb}.json
 ```
+
+Replace {musdb} with one of instruments previously defined in `musdb18_data_prep.py`.
 
 
 ## Pretrained models:
@@ -35,5 +37,5 @@ Pretrained models and configurations will be released soon.
 
 ## References
 
-
+[GlowTTS](https://github.com/jaywalnut310/glow-tts)
 
