@@ -1,6 +1,6 @@
 
 # Generative Source Separation using Glow
-Source separation as an inverse problem. Open source code for the paper 'Music Source Separation with Generative Flow' [arxiv](https://arxiv.org/). Demo page will be released soon.
+Source separation as an inverse problem. Open source code for the paper 'Music Source Separation with Generative Flow' [arxiv](https://arxiv.org/abs/2204.09079). Demo page will be released soon.
 
 ## Introduction
 Music source separation with both paired mixed signals and source signals has obtained substantial progress over the years. However, this setting highly relies on large amounts of paired data. Source-only supervision decouples the process of learning a mapping from a mixture to particular sources into a two stage paradigm: source modeling and separation. In this project, we leverage flow-based implicit generators to train music source priors and likelihood based objective to separate music mixtures.
