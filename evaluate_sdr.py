@@ -7,10 +7,9 @@ import generator.glow.commons as commons
 import generator.glow.utils as glowutils
 import museval
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-modelDir = './generator/unglow/logs/bass_spec'
-# resultFolder = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp1/music_high_xmap/'
-resultFolder = '/storage/ge/slakh/model_test/glow_high_sigma/'
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+modelDir = '/storage/ge/ckpts/prj-gss/glow/specs/bass_spec'
+resultFolder = '/storage/ge/musdb18/model_test/music/'
 hps = glowutils.get_hparams_from_dir(modelDir)
 hparams = hps.data
 stft = commons.TacotronSTFT(hparams.filter_length, hparams.hop_length,
@@ -71,69 +70,21 @@ def eval_musdb(gtList, estFolder):
             
     return total_sdr, energies
 
-def eval_slakh(gtList, estFolder):
-    
-    ## slakh
-    TRACKNAME = ['Bass', 'Drums', 'Guitar', 'Piano']
-    # TRACKNAME = ['Drums', 'Piano', 'Bass']
-    total_sdr = {}
-    energies = {}
-    for track in TRACKNAME:
-        total_sdr[track] = []
-        energies[track] = []
-    for i, gtPkl in enumerate(tqdm(gtList[:])):
-        gt = pickle.load(open(gtPkl, "rb" ))
-        estFolder, _ = os.path.split(gtPkl)
-        estPath = os.path.join(estFolder, 'est.pkl')
-        est = pickle.load(open(estPath, "rb" ))
-
-        mix_ang = gt['mix_ang']
-        for j, track in enumerate(TRACKNAME):
-
-            if track not in gt:
-                continue
-
-            src = gt[track]
-            frame_size = len(src)
-            steps = int((len(src)/frame_size))
-            for idx in range(steps):
-                unitWav = np.zeros(frame_size)
-                unitWav = src[idx*frame_size: (idx+1)*frame_size]
-                unitEnergy = np.inner(unitWav/MAX_WAV_VALUE, unitWav/MAX_WAV_VALUE)
-                energies[track].append(unitEnergy)
-
-            estSrc = est[j]
-            sdrs, xEst = sdr_eval(estSrc[:, :FREQ_BIN], mix_ang, src, frame_size)
-            total_sdr[track].append(sdrs)
-
-    return total_sdr, energies
-
 if __name__ == "__main__":
     
     gtList = glob.glob(resultFolder + '**/gt.pkl', recursive=True)
 
-    if 'musdb' in resultFolder:
-        total_sdr, energies = eval_musdb(gtList[:], resultFolder)
-        total_inst = [i for i in range(numTracks)]
-    elif 'slakh' in resultFolder:
-        total_sdr, energies = eval_slakh(gtList, resultFolder)
-        total_inst = ['Bass', 'Drums', 'Guitar', 'Piano']
+    total_sdr, energies = eval_musdb(gtList[:], resultFolder)
+    total_inst = [i for i in range(numTracks)]
 
     for inst in total_inst:
         sdr_list = []
         enrg_list = []
-        if 'musdb' in resultFolder:
-            for i, sdr_seg in enumerate(total_sdr[inst]):
-                for j, sdr in enumerate(sdr_seg):
-                    if not np.isnan(sdr) and energies[inst][i][j] > 20:
-                        sdr_list.append(sdr)
-                        enrg_list.append(energies[inst][i][j])
-        elif 'slakh' in resultFolder:
-            for i, sdr_seg in enumerate(total_sdr[inst]):
-                sdr = sdr_seg[0]
-                if not np.isnan(sdr) and energies[inst][i] > 20:
+        for i, sdr_seg in enumerate(total_sdr[inst]):
+            for j, sdr in enumerate(sdr_seg):
+                if not np.isnan(sdr) and energies[inst][i][j] > 20:
                     sdr_list.append(sdr)
-                    enrg_list.append(energies[inst][i])
+                    enrg_list.append(energies[inst][i][j])
         
         print(inst)
         print(np.median(sdr_list))
