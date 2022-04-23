@@ -11,10 +11,10 @@ MUSDB: https://sigsep.github.io/datasets/musdb.html
 
 ### Model training
 
-In data preparation, we use `musdb18_data_prep.py` to define instruments to train prior on and for train/test split. Also prepare audio data segments with resampling, trimming and splitting the original MUSDB18 audio files.
+In data preparation, we use `musdb18_data_prep.py` to define instruments to train source priors and train/test split. Also prepare audio data segments with resampling, trimming and splitting the original MUSDB18 audio files.
 
 Before training, create json file similar to given template file in ./configs folder first</br>
-Run `init_musdb.py` first to create list for training and test, then run: </br>
+Run `init_musdb.py` first to create list for training and test: </br>
 ```
 python init_musdb.py -m {musdb} -c ./configs/{musdb}.json
 ```
