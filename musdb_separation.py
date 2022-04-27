@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import random
 import numpy as np
 import inverse_utils
-from source_separation import music_sep_unc_batch, music_sep_batch
+from source_separation import music_sep_batch
 import pickle
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
@@ -20,7 +20,6 @@ HPS['alpha1'] = 1.0
 HPS['alpha2'] = 0.001
 HPS['iteration'] = 200
 TASK = {'singing':['vocals', 'accompaniment'],
-        'music_conditional':['musdb_conditional'],
         'music':['vocals', 'bass', 'drums', 'other']}
 
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/test_music_separation/'
@@ -28,7 +27,7 @@ glowRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/demo_exp
 musdb18List = glob.glob(musdbTBRoot + '*/mixture*.wav')
 modelList = 'music'
     
-def predict_source(genList, stft, musdbMixture, sources, tarFolder, condition):
+def predict_source(genList, stft, musdbMixture, sources, tarFolder):
 
     # read mixture
     sr, mixSample = read(musdbMixture)
@@ -42,7 +41,7 @@ def predict_source(genList, stft, musdbMixture, sources, tarFolder, condition):
         srcs.append(y_src)
     
     # step 1: source separation
-    EstSrc, mixPhase = music_sep_batch(y_mix, genList, stft, condition=condition, **HPS)
+    EstSrc, mixPhase = music_sep_batch(y_mix, genList, stft, **HPS)
 
     # step 2: resynthesizing from linear spectrogram and save GTs
     with open(os.path.join(tarFolder, 'est.pkl'), 'wb') as handle:
@@ -57,26 +56,16 @@ def predict_source(genList, stft, musdbMixture, sources, tarFolder, condition):
         pickle.dump(gt_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
-    
-    condition = True if 'condition' in modelList else False
 
     # load generators for source separation
     print('Load Glow Generators:...')
     genList = []
     labels = []
-    if not condition:
-        for modelName in TASK[modelList]:
-            genModel, STFTfunc = inverse_utils.load_glow(modelName=modelName, 
-                                                         condition=condition)
-            genList.append(genModel)
-    else:
-        modelName = TASK[modelList][0]
-        genModel, labels2ids, STFTfunc = inverse_utils.load_glow(modelName=modelName, 
-                                                                 condition=condition)
-        labels = list(labels2ids.keys())
-        genList = [genModel, labels, labels2ids]
+    for modelName in TASK[modelList]:
+        genModel, STFTfunc = inverse_utils.load_glow(modelName=modelName)
+        genList.append(genModel)
     
-#     random.shuffle(musdb18List)
+    random.shuffle(musdb18List)
     for musdbMixture in tqdm(musdb18List[:]):
         
         idx = musdbMixture.split('/')[-1].split('-')[-1].split('.wav')[0]
@@ -88,11 +77,11 @@ if __name__ == "__main__":
             continue
         
         sources = []
-        sourcePool =  labels if condition else TASK[modelList]
+        sourcePool =  TASK[modelList]
         
         for modelName in sourcePool:
             inst = modelName.split('_')[0]
             src_path = os.path.join(folderName, inst + '-' + idx + '.wav')
             sources.append(src_path)
-        predict_source(genList, STFTfunc, musdbMixture, sources, tarFolder, condition)
+        predict_source(genList, STFTfunc, musdbMixture, sources, tarFolder)
         

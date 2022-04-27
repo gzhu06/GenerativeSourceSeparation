@@ -12,22 +12,15 @@ EPSILON = torch.finfo(torch.float32).eps
 
 def music_sep_batch(mixtures, genList, stft,
                     optSpace, lr, sigma, 
-                    alpha1, alpha2, 
-                    iteration, condition=False, 
+                    alpha1, alpha2, iteration,
                     scheduler_step_size=800, 
                     scheduler_gamma=0.2):
 
     # freeze generators weights
-    if condition:
-        gen, labels, labels2ids = genList
-        numGen = len(labels)
-        for param in gen.parameters():
+    numGen = len(genList)
+    for genUnc in genList:
+        for param in genUnc.parameters():
             param.requires_grad = False
-    else:
-        numGen = len(genList)
-        for genUnc in genList:
-            for param in genUnc.parameters():
-                param.requires_grad = False
     
     # compute spectrogram from mixture and cancel the log
     mixSpecs, mixPhases = inverse_utils.get_spec(mixtures, stft) # 513 * T
@@ -54,17 +47,8 @@ def music_sep_batch(mixtures, genList, stft,
         z_masks = []
         for j in range(numGen):
 
-            if condition:
-                label = labels[j]
-                tar_id = labels2ids[label]
-                tar_sid = torch.IntTensor([tar_id]).cuda().long()
-            else:
-                tar_sid = None
-                gen = genList[j]
-
-            xTemp, logdet, z_mask = gen(zCol[:, j, :, :], segLenTensor, 
-                                        g=tar_sid, gen=True) # full batch for each source
-            
+            gen = genList[j]
+            xTemp, logdet, z_mask = gen(zCol[:, j, :, :], segLenTensor, gen=True)
             logdets.append(-logdet) # logdet in reverse gives log|dx/dz|, we want log|dz/dx|
             mixSynSpecs += xTemp
             xCol.append(xTemp)

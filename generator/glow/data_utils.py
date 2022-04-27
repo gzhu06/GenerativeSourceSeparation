@@ -32,8 +32,6 @@ class SpecLoader(torch.utils.data.Dataset):
         audiopath = audiopath_[0]
         spec = self.compute_spec(audiopath)
         spec = F.pad(spec, (0, 0, 0, 1), "constant", 0.0)
-#         spec_add = spec[-1, :] + EPSILON
-#         spec = torch.cat((spec, spec_add.unsqueeze(0)), 0)
         return spec
 
     def compute_spec(self, filename):
