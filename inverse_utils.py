@@ -25,23 +25,14 @@ def get_spec(audio, stft):
     spec = torch.squeeze(spec, 0)
     return spec, pha
 
-def load_glow(modelName="musdb", condition=True):
+def load_glow(modelName="musdb"):
     
     glowFolder = './generator/glow/logs/'
     modelDir = os.path.join(glowFolder, modelName)
     hps = glowutils.get_hparams_from_dir(modelDir)
     checkpointPath = glowutils.latest_checkpoint_path(modelDir)
-    if condition:
-        with open(os.path.join(glowFolder, modelName, 'label2id.pkl'), 'rb') as f:
-            labels2ids = pickle.load(f)
-        f.close()
-        numObj = len(list(labels2ids.keys()))
-    else:
-        numObj = 1
-    print(str(numObj) + " type(s) in total.")
 
-    generator = glowmodels.FlowGenerator(n_speakers=numObj, 
-                                         out_channels=hps.data.n_ipt_channels,
+    generator = glowmodels.FlowGenerator(n_speakers=numObj, out_channels=hps.data.n_ipt_channels,
                                          **hps.model).cuda()
     glowutils.load_checkpoint(checkpointPath, generator)
     generator.eval()
@@ -52,10 +43,7 @@ def load_glow(modelName="musdb", condition=True):
                                 hparams.win_length, hparams.n_mel_channels, 
                                 hparams.sampling_rate, hparams.mel_fmin,
                                 hparams.mel_fmax)
-    if condition:
-        return generator, labels2ids, stft
-    else:
-        return generator, stft
+    return generator, stft
 
 def resynthesize_from_spec(specIPT, mixWav, stft):
 
