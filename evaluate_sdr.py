@@ -12,10 +12,10 @@ modelDir = '/storage/ge/ckpts/prj-gss/glow/specs/bass_spec'
 resultFolder = '/storage/ge/musdb18/model_test/music/'
 hps = glowutils.get_hparams_from_dir(modelDir)
 hparams = hps.data
-stft = commons.TacotronSTFT(hparams.filter_length, hparams.hop_length,
-                            hparams.win_length, hparams.n_mel_channels, 
-                            hparams.sampling_rate, hparams.mel_fmin,
-                            hparams.mel_fmax)
+stft = commons.TacotronSTFT(hparams.filter_length, 
+                            hparams.hop_length,
+                            hparams.win_length, 
+                            hparams.sampling_rate)
 
 MAX_WAV_VALUE = 32768.0
 ENR_THRESHOLD = 20.0

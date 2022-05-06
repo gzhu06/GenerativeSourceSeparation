@@ -65,10 +65,7 @@ def train_and_eval(rank, n_gpus, hps):
                               drop_last=True, collate_fn=collate_fn, sampler=train_sampler)
     if rank == 0:
         validation_list = os.path.join(filelist_dir, hps.data.validation_files)
-        if hps.data.spec_scale == 'linear':
-            val_dataset = SpecLoader(validation_list, hps.data)
-        else:
-            val_dataset = MelLoader(validation_list, hps.data)
+        val_dataset = SpecLoader(validation_list, hps.data)
         val_loader = DataLoader(val_dataset, num_workers=8, shuffle=False,
                                 batch_size=hps.train.batch_size, pin_memory=True,
                                 drop_last=True, collate_fn=collate_fn)
