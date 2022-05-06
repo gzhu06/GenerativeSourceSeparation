@@ -64,10 +64,10 @@ def sequence_mask(length, max_length=None):
 
 class TacotronSTFT(nn.Module):
   def __init__(self, filter_length=1024, 
-               hop_length=256, win_length=1024,
+               hop_length=256, 
+               win_length=1024,
                sampling_rate=22050):
     super(TacotronSTFT, self).__init__()
-    self.n_mel_channels = n_mel_channels
     self.sampling_rate = sampling_rate
     self.stft_fn = STFT(filter_length, hop_length, win_length)
     
