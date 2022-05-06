@@ -18,10 +18,10 @@ class SpecLoader(torch.utils.data.Dataset):
         self.max_wav_value = hparams.max_wav_value
         self.sampling_rate = hparams.sampling_rate
         self.add_noise = hparams.add_noise
-        self.stft = commons.TacotronSTFT(hparams.filter_length, hparams.hop_length, 
-                                         hparams.win_length, hparams.n_mel_channels, 
-                                         hparams.sampling_rate, hparams.mel_fmin,
-                                         hparams.mel_fmax)
+        self.stft = commons.TacotronSTFT(hparams.filter_length, 
+                                         hparams.hop_length, 
+                                         hparams.win_length,
+                                         hparams.sampling_rate)
 
         random.seed(1234)
         random.shuffle(self.audiopaths)
