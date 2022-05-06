@@ -32,7 +32,7 @@ def load_glow(modelName="musdb"):
     hps = glowutils.get_hparams_from_dir(modelDir)
     checkpointPath = glowutils.latest_checkpoint_path(modelDir)
 
-    generator = glowmodels.FlowGenerator(n_speakers=numObj, out_channels=hps.data.n_ipt_channels,
+    generator = glowmodels.FlowGenerator(n_speakers=1, out_channels=hps.data.n_ipt_channels,
                                          **hps.model).cuda()
     glowutils.load_checkpoint(checkpointPath, generator)
     generator.eval()
