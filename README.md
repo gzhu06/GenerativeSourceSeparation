@@ -20,7 +20,7 @@ pandas\
 ## Usage
     
 ### Inference
-There are two examples in `inference_demo.ipynb`, you can also preview these samples in the `Bouns tracks` from the [demo](https://airlabur.github.io/gss/) page. You can also try your own music mixture wav files. In our framework, it's able to process relatively long audio segments (even over 1 minute).
+There are two examples in `inference_demo.ipynb`, you can also preview these samples in the `Bonus tracks` from the [demo](https://airlabur.github.io/gss/) page. You can also try your own music mixture wav files. In our framework, it's able to process relatively long audio segments (even over 1 minute).
 
 ## Experimental Results on MusDB
 | Method     |Backbone   |  Vocals  | Bass     |Drums     | Other    |
