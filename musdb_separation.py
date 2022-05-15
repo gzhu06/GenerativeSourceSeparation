@@ -10,20 +10,20 @@ import inverse_utils
 from source_separation import music_sep_batch
 import pickle
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 EPSILON = torch.finfo(torch.float32).eps
 HPS = {}
-HPS['optSpace'] = 'x'
-HPS['sigma'] = 0.1
+HPS['optSpace'] = 'z'
+HPS['sigma'] = 0.0
 HPS['lr'] = 0.01
 HPS['alpha1'] = 1.0
-HPS['alpha2'] = 0.001
-HPS['iteration'] = 200
+HPS['alpha2'] = 0.0
+HPS['iteration'] = 150
 TASK = {'singing':['vocals', 'accompaniment'],
         'music':['vocals', 'bass', 'drums', 'other']}
 
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/test_music_separation/'
-glowRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/demo_exp'
+glowRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/music_zmle_150'
 musdb18List = glob.glob(musdbTBRoot + '*/mixture*.wav')
 modelList = 'music'
     

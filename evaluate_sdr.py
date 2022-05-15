@@ -7,9 +7,9 @@ import generator.glow.commons as commons
 import generator.glow.utils as glowutils
 import museval
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-modelDir = '/storage/ge/ckpts/prj-gss/glow/specs/bass_spec'
-resultFolder = '/storage/ge/musdb18/model_test/music/'
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+modelDir = './generator/glow/logs/bass'
+resultFolder = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/music_zmle_150'
 hps = glowutils.get_hparams_from_dir(modelDir)
 hparams = hps.data
 stft = commons.TacotronSTFT(hparams.filter_length, 
@@ -21,7 +21,7 @@ MAX_WAV_VALUE = 32768.0
 ENR_THRESHOLD = 20.0
 FREQ_BIN = 513
 numTracks = 4
-gtList = glob.glob(resultFolder + '**/gt.pkl', recursive=True)
+gtList = glob.glob(os.path.join(resultFolder, '**/gt.pkl'), recursive=True)
 
 def sdr_eval(inputMag, angArray, refSrc, frameSize):
     xEst = stft.stft_fn.inverse(inputMag.cpu(), angArray).cpu().numpy()[0]
@@ -72,7 +72,7 @@ def eval_musdb(gtList, estFolder):
 
 if __name__ == "__main__":
     
-    gtList = glob.glob(resultFolder + '**/gt.pkl', recursive=True)
+    gtList = glob.glob(os.path.join(resultFolder, '**/gt.pkl'), recursive=True)
 
     total_sdr, energies = eval_musdb(gtList[:], resultFolder)
     total_inst = [i for i in range(numTracks)]
