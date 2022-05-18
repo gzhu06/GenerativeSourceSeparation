@@ -25,11 +25,14 @@ def get_spec(audio, stft):
     spec = torch.squeeze(spec, 0)
     return spec, pha
 
-def load_glow(glowFolder='./generator/glow/logs/', modelName="musdb"):
+def load_glow(glowFolder='./generator/glow/logs/', modelName="musdb", epoch=None):
     
     modelDir = os.path.join(glowFolder, modelName)
     hps = glowutils.get_hparams_from_dir(modelDir)
-    checkpointPath = glowutils.latest_checkpoint_path(modelDir)
+    if epoch == None:
+        checkpointPath = glowutils.latest_checkpoint_path(modelDir)
+    else:
+        checkpointPath = os.path.join(glowFolder, modelName, 'G_'+str(epoch)+'.pth')
 
     generator = glowmodels.FlowGenerator(n_speakers=1, out_channels=hps.data.n_ipt_channels,
                                          **hps.model).cuda()

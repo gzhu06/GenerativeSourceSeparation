@@ -10,22 +10,22 @@ import inverse_utils
 from source_separation import music_sep_batch
 import pickle
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 EPSILON = torch.finfo(torch.float32).eps
 HPS = {}
-HPS['optSpace'] = 'z'
-HPS['sigma'] = 0.0
+HPS['optSpace'] = 'x'
+HPS['sigma'] = 0.1
 HPS['lr'] = 0.01
 HPS['alpha1'] = 1.0
-HPS['alpha2'] = 0.0
+HPS['alpha2'] = 0.001 # 0.0 for z
 HPS['iteration'] = 150
-TASK = {'singing':['vocals', 'accompaniment'],
-        'music':['vocals', 'bass', 'drums', 'other']}
+TASK = {'singing':['vocals_lr', 'accompaniment_lr'],
+        'music':['vocals_lr', 'bass_lr', 'drums_lr', 'other_lr']}
 
-musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/test_music_separation/'
-glowRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/music_zmle_150'
+musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/test_sv_separation/'
+glowRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/sv_2000_xmap_150'
 musdb18List = glob.glob(musdbTBRoot + '*/mixture*.wav')
-modelList = 'music'
+modelList = 'singing'
     
 def predict_source(genList, stft, musdbMixture, sources, tarFolder):
 

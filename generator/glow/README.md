@@ -28,8 +28,8 @@ Replace {musdb} with one of instruments previously defined in `musdb18_data_prep
 ## Pretrained models:
 
 ### model
-Download this file, unzip and move every folder to `./logs`
-([Pretrained model folder](https://drive.google.com/file/d/16_L8-f1mYZ7oHnoxDpVTjAEpDHeBEb2y/view?usp=sharing))
+Download this model checkpoint folder file, unzip and move every folder to `./logs`
+([Pretrained model folder](https://drive.google.com/file/d/16_L8-f1mYZ7oHnoxDpVTjAEpDHeBEb2y/view?usp=sharing)). You can also continue training these checkpoints.
 
 ## References
 

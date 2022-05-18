@@ -18,6 +18,7 @@ pandas\
 [apex](https://github.com/NVIDIA/apex)
 
 ## Usage
+Download our pretrained checkpoints, then run inference on any audio files.
     
 ### Inference
 There are two examples in `inference_demo.ipynb`, you can also preview these samples in the `Bonus tracks` from the [demo](https://airlabur.github.io/gss/) page. You can also try your own music mixture wav files. In our framework, it's able to process relatively long audio segments (even over 1 minute).
@@ -28,7 +29,7 @@ There are two examples in `inference_demo.ipynb`, you can also preview these sam
 | Demucs(v2) | U-Network |7.14      |5.50      |6.74      |4.16      |
 | Conv-TasNet|TCN        |7.00      |4.19      |5.25      |3.94      |
 | Open Unmix |BiLSTM     |6.86      |4.88      |6.35      |3.86      |
-| Wav-U-Net  | U-Network |5.06      |2.63      |3.74      |1.95      |
+| Wave-U-Net  | U-Network |5.06      |2.63      |3.74      |1.95      |
 | InstGlow   |Glow       |3.92      |2.58      |3.85      |2.37      |
 
 ## References

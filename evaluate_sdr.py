@@ -7,9 +7,9 @@ import generator.glow.commons as commons
 import generator.glow.utils as glowutils
 import museval
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-modelDir = './generator/glow/logs/bass'
-resultFolder = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/music_zmle_150'
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+modelDir = './generator/glow/logs/bass_lr'
+resultFolder = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/music_2000_zmle_150'
 hps = glowutils.get_hparams_from_dir(modelDir)
 hparams = hps.data
 stft = commons.TacotronSTFT(hparams.filter_length, 
