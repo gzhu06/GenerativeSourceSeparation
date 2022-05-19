@@ -36,8 +36,8 @@ def resample_file(fileList, outFolder):
         # confrim process completed successfully
         assert completed_process.returncode == 0
 
-#         # confirm new file has desired sample rate
-#         assert soundfile.info(outputAudiofile).samplerate == SR
+        # confirm new file has desired sample rate
+        assert soundfile.info(outputAudiofile).samplerate == SR
         
 def trim_files(folder, saveFolder, instType):
     """
