@@ -18,7 +18,7 @@ pandas\
 [apex](https://github.com/NVIDIA/apex)
 
 ## Usage
-Download our pretrained checkpoints, then run inference on any audio files.
+Download our pretrained [checkpoints](https://drive.google.com/file/d/16_L8-f1mYZ7oHnoxDpVTjAEpDHeBEb2y/view?usp=sharing), then run inference on any audio files.
     
 ### Inference
 There are two examples in `inference_demo.ipynb`, you can also preview these samples in the `Bonus tracks` from the [demo](https://airlabur.github.io/gss/) page. You can also try your own music mixture wav files. In our framework, it's able to process relatively long audio segments (even over 1 minute).
