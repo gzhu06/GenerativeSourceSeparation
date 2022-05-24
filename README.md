@@ -14,7 +14,7 @@ librosa\
 jupyter\
 museval\
 tqdm\
-pandas\
+pandas
 
 ## Usage
 
