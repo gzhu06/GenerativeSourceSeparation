@@ -10,10 +10,9 @@ import inverse_utils
 import generator.glow.commons as commons
 EPSILON = torch.finfo(torch.float32).eps
 
-def music_sep_batch(mixtures, genList, stft,
-                    optSpace, lr, sigma, 
-                    alpha1, alpha2, iteration,
-                    scheduler_step_size=800, 
+def music_sep_batch(mixtures, genList, stft, optSpace, 
+                    lr, sigma, alpha1, alpha2, iteration, 
+                    mask=False, wiener=False, scheduler_step=800, 
                     scheduler_gamma=0.2):
 
     # freeze generators weights
@@ -37,7 +36,7 @@ def music_sep_batch(mixtures, genList, stft,
     zCol = (sigma * zCol).requires_grad_(True)
     
     optimizer = optim.Adam([zCol], lr=lr)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step, gamma=scheduler_gamma)
 
     # define loss and initialize data variables
     for i in tqdm(range(iteration)):
@@ -50,9 +49,20 @@ def music_sep_batch(mixtures, genList, stft,
             gen = genList[j]
             xTemp, logdet, z_mask = gen(zCol[:, j, :, :], segLenTensor, gen=True)
             logdets.append(-logdet) # logdet in reverse gives log|dx/dz|, we want log|dz/dx|
-            mixSynSpecs += xTemp
-            xCol.append(xTemp)
             z_masks.append(z_mask)
+            
+            if mask:
+                if i > 5:
+                    maskTemp = torch.div(torch.sum(xTemp, dim=1), 
+                                         torch.max(torch.sum(xTemp, dim=1), 
+                                                   torch.sum(mixSpecs, dim=1))+1e-8).unsqueeze(1)
+                else:
+                    maskTemp = torch.ones((batch_size, 1, segLen), dtype=torch.float, device='cuda')
+                mixSynSpecs += xTemp * maskTemp
+                xCol.append(xTemp * maskTemp)
+            else:
+                mixSynSpecs += xTemp
+                xCol.append(xTemp)
 
         mixSpecs = torch.abs(mixSpecs)  + 1e-8
         mixSynSpecs = torch.abs(mixSynSpecs)  + 1e-8
@@ -77,4 +87,11 @@ def music_sep_batch(mixtures, genList, stft,
         optimizer.step()
         scheduler.step()
     
-    return torch.stack(xCol), mixPhases
+    xCol_wiener = []
+    if wiener:
+        for i in range(len(xCol)): 
+            xCol_wiener.append(torch.mul(torch.div(xCol[i], mixSynSpecs), mixSpecs))
+    
+        return torch.stack(xCol_wiener), mixPhases
+    else:
+        return torch.stack(xCol), mixPhases
