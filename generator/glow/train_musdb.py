@@ -10,8 +10,6 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import torch.multiprocessing as mp
 import torch.distributed as dist
-from apex.parallel import DistributedDataParallel as DDP
-from apex import amp
 import numpy as np
 
 from torch.optim import Adam, lr_scheduler
@@ -74,11 +72,10 @@ def train_and_eval(rank, n_gpus, hps):
                                      out_channels=hps.data.n_ipt_channels,
                                      **hps.model).cuda(rank)
     optimizer_g = torch.optim.Adam(generator.parameters(), lr=hps.train.learning_rate)
+    scaler = torch.cuda.amp.GradScaler()
     scheduler = lr_scheduler.StepLR(optimizer_g, hps.train.decay_steps, 
                                     gamma=hps.train.decay_rate, last_epoch=-1)
-    if hps.train.fp16_run:
-        generator, optimizer_g = amp.initialize(generator, optimizer_g, opt_level="O1")
-    generator = DDP(generator)
+
     epoch_str = 1
     global_step = 0
     
@@ -94,35 +91,50 @@ def train_and_eval(rank, n_gpus, hps):
 
     for epoch in range(epoch_str, hps.train.epochs + 1):
         if rank==0:
-            train(rank, epoch, hps, generator, optimizer_g, scheduler, train_loader, logger, writer)
+            train(rank, epoch, hps, generator, optimizer_g, scaler, 
+                  scheduler, train_loader, logger, writer)
             evaluate(rank, epoch, hps, generator, optimizer_g, val_loader, logger, writer_eval)
             if epoch % hps.train.log_interval == 0:
-                utils.save_checkpoint(generator, optimizer_g, scheduler.get_lr(), 
-                                      epoch, os.path.join(hps.model_dir, "G_{}.pth".format(epoch)))
+                utils.save_checkpoint(generator, optimizer_g, scaler,
+                                      scheduler.get_lr(), epoch, 
+                                      os.path.join(hps.model_dir, "G_{}.pth".format(epoch)))
         else:
-            train(rank, epoch, hps, generator, optimizer_g, scheduler, train_loader, None, None)
+            train(rank, epoch, hps, generator, optimizer_g, 
+                  scalerscheduler, train_loader, None, None)
 
-def train(rank, epoch, hps, generator, optimizer_g, scheduler, train_loader, logger, writer):
+def train(rank, epoch, hps, generator, optimizer_g, scaler, 
+          scheduler, train_loader, logger, writer):
+    
     train_loader.sampler.set_epoch(epoch)
     global global_step
 
     generator.train()
+    use_amp = True
+    
     for batch_idx, (y, y_lengths) in enumerate(train_loader):
         y, y_lengths = y.cuda(rank, non_blocking=True), y_lengths.cuda(rank, non_blocking=True)
-
+        
         # Train Generator
+        with torch.cuda.amp.autocast(enabled=use_amp):
+            z, logdet, z_mask = generator(y, y_lengths, gen=False)
+            l_mle = commons.mle_loss(z, logdet, z_mask)
+
+            loss_gs = [l_mle]
+            loss_g = sum(loss_gs)
+        
+        scaler.scale(loss_g).backward()
+
+        # Unscales the gradients of optimizer's assigned params in-place
+        scaler.unscale_(optimizer_g)
+
+#         Since the gradients of optimizer's assigned params are now unscaled, clips as usual.
+#         You may use the same value for max_norm here as you would without gradient scaling.
+        torch.nn.utils.clip_grad_norm_(generator.parameters(), max_norm=4)
+        
+        scaler.step(optimizer_g)
+        scaler.update()
         optimizer_g.zero_grad()
         
-        z, logdet, z_mask = generator(y, y_lengths, gen=False)
-        l_mle = commons.mle_loss(z, logdet, z_mask)
-
-        loss_gs = [l_mle]
-        loss_g = sum(loss_gs)
-
-        with amp.scale_loss(loss_g, optimizer_g) as scaled_loss:
-            scaled_loss.backward()
-        torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer_g), 4)
-        optimizer_g.step()
         
         if rank==0:
             if batch_idx % hps.train.log_interval == 0:

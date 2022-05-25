@@ -8,14 +8,13 @@ Music source separation with both paired mixed signals and source signals has ob
 <p align="center"><img align="center" src="./diagram.png", width=900></p>
 
 ## requirements
-pytorch>=1.5.0\
+pytorch>=1.10.0\
 tqdm\
 librosa\
 jupyter\
 museval\
 tqdm\
-pandas\
-[apex](https://github.com/NVIDIA/apex)
+pandas
 
 ## Usage
 Download our pretrained [checkpoints](https://drive.google.com/file/d/16_L8-f1mYZ7oHnoxDpVTjAEpDHeBEb2y/view?usp=sharing), then run inference on any audio files.

@@ -160,12 +160,14 @@ def split_test_files(iptMixfolder, optFolder, sources=['drums.wav']):
 def main():
 
     musdbRoot = '/storage/ge/musdb18/musdb18_wav/'
+    dsFolder = os.path.join(musdbRoot, 'processed', 'wav')
+    allstemFiles = glob.glob(os.path.join(musdbRoot, '**/*.wav'), recursive=True)
     dataTypes = ['test']
     instsOfInterest = ['vocals', 'accompaniment']
     
     if args.resample:
-        os.makedirs(outputFolder, exist_ok=True)
-        resample_file(stemFiles, outputFolder)
+        os.makedirs(dsFolder, exist_ok=True)
+        resample_file(allstemFiles, dsFolder)
     
     elif 'test' in dataTypes:
         musdbTestFolder = os.path.join(musdbRoot, 'raw/test')

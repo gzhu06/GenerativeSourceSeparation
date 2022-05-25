@@ -50,9 +50,20 @@ def music_sep_batch(mixtures, genList, stft,
             gen = genList[j]
             xTemp, logdet, z_mask = gen(zCol[:, j, :, :], segLenTensor, gen=True)
             logdets.append(-logdet) # logdet in reverse gives log|dx/dz|, we want log|dz/dx|
-            mixSynSpecs += xTemp
-            xCol.append(xTemp)
             z_masks.append(z_mask)
+            
+            ###############
+            if i > 5:
+                maskTemp = torch.div(torch.sum(xTemp, dim=1), 
+                                     torch.max(torch.sum(xTemp, dim=1), 
+                                               torch.sum(mixSpecs, dim=1))+1e-8).unsqueeze(1)
+            else:
+                maskTemp = torch.ones((batch_size, 1, segLen), dtype=torch.float, device='cuda')
+            mixSynSpecs += xTemp * maskTemp
+            xCol.append(xTemp * maskTemp)
+            ##############
+#             mixSynSpecs += xTemp
+#             xCol.append(xTemp)
 
         mixSpecs = torch.abs(mixSpecs)  + 1e-8
         mixSynSpecs = torch.abs(mixSynSpecs)  + 1e-8

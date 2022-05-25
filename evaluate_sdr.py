@@ -10,7 +10,7 @@ import museval
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 modelDir = './generator/glow/logs/bass_lr'
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/'
-resultFolder = os.path.join(musdbTBRoot, 'mini_test_glow', 'sv_1500_zmle_150')
+resultFolder = os.path.join(musdbTBRoot, 'test_glow', 'exp2', 'sv_1000_zmle_150torch_clip')
 hps = glowutils.get_hparams_from_dir(modelDir)
 hparams = hps.data
 stft = commons.TacotronSTFT(hparams.filter_length, 
