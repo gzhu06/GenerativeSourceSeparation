@@ -10,31 +10,22 @@ import inverse_utils
 from source_separation import music_sep_batch
 import pickle
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 EPSILON = torch.finfo(torch.float32).eps
 HPS = {}
-optiObj = 'mle'
+HPS['optSpace'] = 'x'
+HPS['sigma'] = 0.1
 HPS['lr'] = 0.01
 HPS['alpha1'] = 1.0
+HPS['alpha2'] = 0.001 # 0.0 for z
 HPS['iteration'] = 150
-HPS['optSpace'] = 'z'
-HPS['sigma'] = 0.0
-HPS['alpha2'] = 0.0 # 0.0 for z
-if optiObj == 'map':
-    HPS['optSpace'] = 'x'
-    HPS['sigma'] = 0.1
-    HPS['alpha2'] = 0.001 # 0.0 for z
-
-TASK = {'sv':['vocals_torch', 'accompaniment_torch'],
+TASK = {'singing':['vocals_lr', 'accompaniment_lr'],
         'music':['vocals_lr', 'bass_lr', 'drums_lr', 'other_lr']}
 
-musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/'
-mixData = 'test_sv_separation'
-epoch = 800
-modelList = 'sv'
-expName = modelList+'_'+str(epoch)+'_'+HPS['optSpace']+optiObj+'_'+str(HPS['iteration'])
-glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 'test_glow', 'exp2', expName + '_torch')
-musdb18List = glob.glob(os.path.join(musdbTBRoot, 'pieces', mixData, '*/mixture*.wav'))
+musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/test_sv_separation/'
+glowRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/sv_2000_xmap_150'
+musdb18List = glob.glob(musdbTBRoot + '*/mixture*.wav')
+modelList = 'singing'
     
 def predict_source(genList, stft, musdbMixture, sources, tarFolder):
 
@@ -71,7 +62,7 @@ if __name__ == "__main__":
     genList = []
     labels = []
     for modelName in TASK[modelList]:
-        genModel, STFTfunc = inverse_utils.load_glow(modelName=modelName, epoch=epoch)
+        genModel, STFTfunc = inverse_utils.load_glow(modelName=modelName)
         genList.append(genModel)
     
     random.shuffle(musdb18List)

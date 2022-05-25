@@ -8,24 +8,20 @@ Music source separation with both paired mixed signals and source signals has ob
 <p align="center"><img align="center" src="./diagram.png", width=900></p>
 
 ## requirements
-pytorch>=1.10.0\
+pytorch>=1.5.0\
 tqdm\
 librosa\
 jupyter\
 museval\
 tqdm\
-pandas
+pandas\
+[apex](https://github.com/NVIDIA/apex)
 
 ## Usage
-
-### Temp
-First switch to `apex` branch and download our apex pretrained [checkpoints](https://drive.google.com/file/d/16_L8-f1mYZ7oHnoxDpVTjAEpDHeBEb2y/view?usp=sharing), then run inference on any audio files. Native torch amp pretrained ckpts will be uploaded soon.
+Download our pretrained checkpoints, then run inference on any audio files.
     
 ### Inference
 There are two examples in `inference_demo.ipynb`, you can also preview these samples in the `Bonus tracks` from the [demo](https://airlabur.github.io/gss/) page. You can also try your own music mixture wav files. In our framework, it's able to process relatively long audio segments (even over 1 minute).
-
-### Reproducing experimental results in the paper
-First prepare test portion of MUSDB18 using `musdb18_data_prep.py` in `preprocessing` folder. Then run `musdb_spearation.py` and `evaluate_sdr.py` with defined model checkpoint path and parameters.
 
 ## Experimental Results on MusDB
 | Method     |Backbone   |  Vocals  | Bass     |Drums     | Other    |

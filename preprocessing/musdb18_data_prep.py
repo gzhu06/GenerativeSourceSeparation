@@ -36,8 +36,8 @@ def resample_file(fileList, outFolder):
         # confrim process completed successfully
         assert completed_process.returncode == 0
 
-        # confirm new file has desired sample rate
-        assert soundfile.info(outputAudiofile).samplerate == SR
+#         # confirm new file has desired sample rate
+#         assert soundfile.info(outputAudiofile).samplerate == SR
         
 def trim_files(folder, saveFolder, instType):
     """
@@ -160,14 +160,12 @@ def split_test_files(iptMixfolder, optFolder, sources=['drums.wav']):
 def main():
 
     musdbRoot = '/storage/ge/musdb18/musdb18_wav/'
-    dsFolder = os.path.join(musdbRoot, 'processed', 'wav')
-    allstemFiles = glob.glob(os.path.join(musdbRoot, '**/*.wav'), recursive=True)
     dataTypes = ['test']
     instsOfInterest = ['vocals', 'accompaniment']
     
     if args.resample:
-        os.makedirs(dsFolder, exist_ok=True)
-        resample_file(allstemFiles, dsFolder)
+        os.makedirs(outputFolder, exist_ok=True)
+        resample_file(stemFiles, outputFolder)
     
     elif 'test' in dataTypes:
         musdbTestFolder = os.path.join(musdbRoot, 'raw/test')

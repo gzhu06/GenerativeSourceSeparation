@@ -7,10 +7,9 @@ import generator.glow.commons as commons
 import generator.glow.utils as glowutils
 import museval
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-modelDir = './generator/glow/logs/bass_torch'
-musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/'
-resultFolder = os.path.join(musdbTBRoot, 'test_glow', 'exp2', 'sv_1000_zmle_150_torch')
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+modelDir = './generator/glow/logs/bass_lr'
+resultFolder = '/storage/ge/musdb18/musdb18_wav/pieces/model_test/test_glow/exp2/music_2000_zmle_150'
 hps = glowutils.get_hparams_from_dir(modelDir)
 hparams = hps.data
 stft = commons.TacotronSTFT(hparams.filter_length, 
@@ -21,7 +20,7 @@ stft = commons.TacotronSTFT(hparams.filter_length,
 MAX_WAV_VALUE = 32768.0
 ENR_THRESHOLD = 20.0
 FREQ_BIN = 513
-numTracks = 2
+numTracks = 4
 gtList = glob.glob(os.path.join(resultFolder, '**/gt.pkl'), recursive=True)
 
 def sdr_eval(inputMag, angArray, refSrc, frameSize):

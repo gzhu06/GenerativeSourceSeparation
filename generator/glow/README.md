@@ -3,7 +3,7 @@
 Unconditional audio generator Glow 
 
 ## Introduction
-We provide uncontional generator training using MUSDB18 for modeling source priors.
+We provide uncontional generator training using MUSDB18 for modeling source priors. In Glow generator training, we use apex from NVIDIA.
 
 ## Usage
 ### Dataset:
