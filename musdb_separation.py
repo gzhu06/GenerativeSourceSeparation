@@ -25,15 +25,15 @@ if optiObj == 'map':
     HPS['sigma'] = 0.1
     HPS['alpha2'] = 0.001 # 0.0 for z
 
-TASK = {'sv':['vocals_torch_clip', 'accompaniment_torch_clip'],
+TASK = {'sv':['vocals_torch', 'accompaniment_torch'],
         'music':['vocals_lr', 'bass_lr', 'drums_lr', 'other_lr']}
 
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/'
 mixData = 'test_sv_separation'
-epoch = 1000
+epoch = 800
 modelList = 'sv'
 expName = modelList+'_'+str(epoch)+'_'+HPS['optSpace']+optiObj+'_'+str(HPS['iteration'])
-glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 'test_glow', 'exp2', expName + 'torch_clip')
+glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 'test_glow', 'exp2', expName + '_torch')
 musdb18List = glob.glob(os.path.join(musdbTBRoot, 'pieces', mixData, '*/mixture*.wav'))
     
 def predict_source(genList, stft, musdbMixture, sources, tarFolder):

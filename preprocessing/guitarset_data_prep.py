@@ -105,7 +105,7 @@ def split_files(folder, tarFolder):
 
 def main():
 
-    datasetRoot = '/storage/ge/guitarset/'
+    datasetRoot = '/storage/ge/gtrSource/'
     outputFolder = os.path.join(datasetRoot, 'mono_wav')
     trimFolder = os.path.join(datasetRoot, 'trimmed')
     pieceFolder = os.path.join(datasetRoot, 'pieces')
