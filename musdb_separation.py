@@ -13,27 +13,35 @@ import pickle
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 EPSILON = torch.finfo(torch.float32).eps
 HPS = {}
-optiObj = 'mle'
 HPS['lr'] = 0.01
 HPS['alpha1'] = 1.0
+HPS['alpha2'] = 0.0 
 HPS['iteration'] = 150
 HPS['optSpace'] = 'z'
 HPS['sigma'] = 0.0
-HPS['alpha2'] = 0.0 # 0.0 for z
-if optiObj == 'map':
-    HPS['optSpace'] = 'x'
-    HPS['sigma'] = 0.1
-    HPS['alpha2'] = 0.001 # 0.0 for z
 
-TASK = {'sv':['vocals_lr', 'accompaniment_lr'],
-        'music':['vocals_lr', 'bass_lr', 'drums_lr', 'other_lr']}
+if HPS['alpha2'] != 0.0:
+    optiObj = 'map' + str(HPS['alpha2'])
+else:
+    optiObj = 'mle'
+
+# if optiObj == 'map':
+#     HPS['optSpace'] = 'z'
+#     HPS['sigma'] = 0.1
+#     HPS['alpha2'] = 1.0 # 0.0 for z
+
+TASK = {'sv':['vocals_lowspec', 'accompaniment_lowspec'],
+        'music':['vocals', 'bass', 'drums', 'other']}
+modelPath = '/storage/ge/ckpts/prj-gss/glow/specs'
 
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/'
-mixData = 'test_sv_separation'
+mixData = 'test_sv_mini'
 epoch = 1000
 modelList = 'sv'
+comment = 'low'
 expName = modelList+'_'+str(epoch)+'_'+HPS['optSpace']+optiObj+'_'+str(HPS['iteration'])
-glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 'test_glow', 'exp2', expName + 'torch_clip')
+glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 
+                        'mini_test_glow', 'exp1', expName+'_'+comment)
 musdb18List = glob.glob(os.path.join(musdbTBRoot, 'pieces', mixData, '*/mixture*.wav'))
     
 def predict_source(genList, stft, musdbMixture, sources, tarFolder):
@@ -71,7 +79,9 @@ if __name__ == "__main__":
     genList = []
     labels = []
     for modelName in TASK[modelList]:
-        genModel, STFTfunc = inverse_utils.load_glow(modelName=modelName, epoch=epoch)
+        genModel, STFTfunc = inverse_utils.load_glow(glowFolder=modelPath, 
+                                                     modelName=modelName, 
+                                                     epoch=epoch)
         genList.append(genModel)
     
     random.shuffle(musdb18List)

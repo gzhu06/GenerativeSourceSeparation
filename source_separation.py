@@ -52,7 +52,7 @@ def music_sep_batch(mixtures, genList, stft, optSpace,
             z_masks.append(z_mask)
             
             if mask:
-                if i > 5:
+                if i > 3:
                     maskTemp = torch.div(torch.sum(xTemp, dim=1), 
                                          torch.max(torch.sum(xTemp, dim=1), 
                                                    torch.sum(mixSpecs, dim=1))+1e-8).unsqueeze(1)
@@ -67,7 +67,11 @@ def music_sep_batch(mixtures, genList, stft, optSpace,
         mixSpecs = torch.abs(mixSpecs)  + 1e-8
         mixSynSpecs = torch.abs(mixSynSpecs)  + 1e-8
         
-        loss_rec = (mixSpecs * torch.log(mixSpecs/mixSynSpecs + 1e-8) - mixSpecs + mixSynSpecs).mean()
+        loss_kl = (mixSpecs * torch.log(mixSpecs/mixSynSpecs + 1e-8) - mixSpecs + mixSynSpecs)
+        loss_mask = torch.ones((batch_size, mixSpecs.shape[-2], segLen), 
+                               dtype=torch.float, device='cuda')
+        loss_mask[:, -1, :] = 0.0
+        loss_rec = (loss_kl*loss_mask).mean()
 
         # regularization
         loss_r = 0.0
@@ -75,12 +79,14 @@ def music_sep_batch(mixtures, genList, stft, optSpace,
             if optSpace == 'z':
                 lss = 0.5 * torch.sum(zCol[:, j, :, :] ** 2) # neg normal likelihood w/o the constant term
                 l_mle = lss / torch.sum(torch.ones_like(zCol[:, j, :, :]) * z_masks[j]) # averaging across batch, channel and time axes
+
             elif optSpace == 'x':
                 l_mle = commons.mle_loss(zCol[:, j, :, :], logdets[j], z_masks[j]) # logdets and z_masks are first indexed by source_num
             loss_gs = [l_mle]
             loss_r += sum(loss_gs)
             
         loss = alpha1 * loss_rec + alpha2 * loss_r #+ 0.1 * loss_coh
+        
 
         optimizer.zero_grad()
         loss.backward()
