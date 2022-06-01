@@ -67,7 +67,8 @@ class ConvReluNorm(nn.Module):
 
 
 class WN(torch.nn.Module):
-  def __init__(self, in_channels, hidden_channels, kernel_size, dilation_rate, n_layers, gin_channels=0, p_dropout=0):
+  def __init__(self, in_channels, hidden_channels, kernel_size, 
+               dilation_rate, n_layers, gin_channels=0, p_dropout=0):
       super(WN, self).__init__()
       assert(kernel_size % 2 == 1)
       assert(hidden_channels % 2 == 0)

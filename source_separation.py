@@ -87,7 +87,6 @@ def music_sep_batch(mixtures, genList, stft, optSpace,
             
         loss = alpha1 * loss_rec + alpha2 * loss_r #+ 0.1 * loss_coh
         
-
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

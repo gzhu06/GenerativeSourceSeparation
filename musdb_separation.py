@@ -10,12 +10,12 @@ import inverse_utils
 from source_separation import music_sep_batch
 import pickle
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 EPSILON = torch.finfo(torch.float32).eps
 HPS = {}
 HPS['lr'] = 0.01
 HPS['alpha1'] = 1.0
-HPS['alpha2'] = 0.0 
+HPS['alpha2'] = 0.0
 HPS['iteration'] = 150
 HPS['optSpace'] = 'z'
 HPS['sigma'] = 0.0
@@ -25,20 +25,16 @@ if HPS['alpha2'] != 0.0:
 else:
     optiObj = 'mle'
 
-# if optiObj == 'map':
-#     HPS['optSpace'] = 'z'
-#     HPS['sigma'] = 0.1
-#     HPS['alpha2'] = 1.0 # 0.0 for z
-
-TASK = {'sv':['vocals_lowspec', 'accompaniment_lowspec'],
+TASK = {'sv':['vocals_lr_shift2', 'accompaniment'],
         'music':['vocals', 'bass', 'drums', 'other']}
-modelPath = '/storage/ge/ckpts/prj-gss/glow/specs'
-
+# modelPath = '/storage/ge/ckpts/prj-gss/glow/specs'
+# modelPath = '/home/ge/prj-gss/generator/unglow/logs'
+modelPath = './generator/glow/logs'
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/'
 mixData = 'test_sv_mini'
-epoch = 1000
+epoch = 800
 modelList = 'sv'
-comment = 'low'
+comment = ''
 expName = modelList+'_'+str(epoch)+'_'+HPS['optSpace']+optiObj+'_'+str(HPS['iteration'])
 glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 
                         'mini_test_glow', 'exp1', expName+'_'+comment)
