@@ -25,19 +25,18 @@ if HPS['alpha2'] != 0.0:
 else:
     optiObj = 'mle'
 
-TASK = {'sv':['vocals_lr_shift2', 'accompaniment'],
+TASK = {'sv':['vocals', 'accompaniment'],
         'music':['vocals', 'bass', 'drums', 'other']}
-# modelPath = '/storage/ge/ckpts/prj-gss/glow/specs'
-# modelPath = '/home/ge/prj-gss/generator/unglow/logs'
+
 modelPath = './generator/glow/logs'
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/'
-mixData = 'test_sv_mini'
+mixData = 'test_sv_separation'
 epoch = 800
 modelList = 'sv'
 comment = ''
 expName = modelList+'_'+str(epoch)+'_'+HPS['optSpace']+optiObj+'_'+str(HPS['iteration'])
 glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 
-                        'mini_test_glow', 'exp1', expName+'_'+comment)
+                        'test_glow', 'exp1', expName+'_'+comment)
 musdb18List = glob.glob(os.path.join(musdbTBRoot, 'pieces', mixData, '*/mixture*.wav'))
     
 def predict_source(genList, stft, musdbMixture, sources, tarFolder):
