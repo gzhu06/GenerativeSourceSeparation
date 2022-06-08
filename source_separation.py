@@ -58,7 +58,7 @@ def music_sep_batch(mixtures, genList, stft, optSpace,
                                                    torch.sum(mixSpecs, dim=1))+1e-8).unsqueeze(1)
                 else:
                     maskTemp = torch.ones((batch_size, 1, segLen), dtype=torch.float, device='cuda')
-                mixSynSpecs += xTemp * maskTemp
+                mixSynSpecs += xTemp * torch.pow(maskTemp, 1.0)
                 xCol.append(xTemp * maskTemp)
             else:
                 mixSynSpecs += xTemp

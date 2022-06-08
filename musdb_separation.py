@@ -13,10 +13,10 @@ import pickle
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 EPSILON = torch.finfo(torch.float32).eps
 HPS = {}
-HPS['lr'] = 0.01
+HPS['lr'] = 0.005
 HPS['alpha1'] = 1.0
 HPS['alpha2'] = 0.0
-HPS['iteration'] = 150
+HPS['iteration'] = 300
 HPS['optSpace'] = 'z'
 HPS['sigma'] = 0.0
 
@@ -25,18 +25,18 @@ if HPS['alpha2'] != 0.0:
 else:
     optiObj = 'mle'
 
-TASK = {'sv':['vocals', 'accompaniment'],
+TASK = {'sv':['vocals_spec_513', 'accompaniment_spec_513'],
         'music':['vocals', 'bass', 'drums', 'other']}
 
 modelPath = './generator/glow/logs'
 musdbTBRoot = '/storage/ge/musdb18/musdb18_wav/'
-mixData = 'test_sv_separation'
-epoch = 800
+mixData = 'test_sv_mini'
+epoch = 1000
 modelList = 'sv'
-comment = ''
+comment = 'lr'
 expName = modelList+'_'+str(epoch)+'_'+HPS['optSpace']+optiObj+'_'+str(HPS['iteration'])
 glowRoot = os.path.join(musdbTBRoot, 'pieces', 'model_test', 
-                        'test_glow', 'exp1', expName+'_'+comment)
+                        'mini_test_glow', 'exp1', expName+'_'+comment)
 musdb18List = glob.glob(os.path.join(musdbTBRoot, 'pieces', mixData, '*/mixture*.wav'))
     
 def predict_source(genList, stft, musdbMixture, sources, tarFolder):
